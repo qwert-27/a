@@ -1,0 +1,98 @@
+#Quick sort
+BEGIN
+
+    # ---------- PARTITION FUNCTION ----------
+    FUNCTION partition(arr, low, high)
+        pivot ← arr[high]           # choose last element as pivot
+        i ← low - 1                 # pointer for smaller element
+        
+        FOR j FROM low TO high - 1 DO
+            IF arr[j] <= pivot THEN
+                i ← i + 1
+                SWAP arr[i] ↔ arr[j]
+            ENDIF
+        ENDFOR
+
+        SWAP arr[i + 1] ↔ arr[high]
+        RETURN (i + 1)              # partition index
+    END FUNCTION
+
+
+    # ---------- QUICK SORT FUNCTION ----------
+    FUNCTION quick_sort(arr, low, high)
+        IF low < high THEN
+            pi ← partition(arr, low, high)      # get partition index
+            CALL quick_sort(arr, low, pi - 1)   # sort left subarray
+            CALL quick_sort(arr, pi + 1, high)  # sort right subarray
+        ENDIF
+    END FUNCTION
+
+
+
+#code
+import random
+import time
+import matplotlib.pyplot as plt
+
+# Partition Function
+def partition(arr, low, high):
+    pivot = arr[high]  # choose last element as pivot
+    i = low - 1  # pointer for smaller element
+    
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]  # swap
+            
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1  # return partition index
+
+
+# Quick Sort Function (Recursive)
+def quick_sort(arr, low, high):
+    if low < high:
+        pi = partition(arr, low, high)
+        quick_sort(arr, low, pi - 1)
+        quick_sort(arr, pi + 1, high)
+
+
+# Function to Measure Time Taken
+def measure_time(arr):
+    start = time.time()
+    quick_sort(arr, 0, len(arr) - 1)
+    end = time.time()
+    return end - start
+
+
+# Different Input Sizes
+sizes = [100, 500, 1000, 2000, 5000, 8000, 10000]
+best_times = []
+avg_times = []
+worst_times = []
+
+for n in sizes:
+    # Best Case → already sorted array (balanced partitions if pivot is middle)
+    arr_best = list(range(n))
+    best_times.append(measure_time(arr_best.copy()))
+    
+    # Average Case → random elements
+    arr_avg = [random.randint(0, 100000) for _ in range(n)]
+    avg_times.append(measure_time(arr_avg.copy()))
+    
+    # Worst Case → reverse sorted (pivot always largest)
+    arr_worst = list(range(n, 0, -1))
+    worst_times.append(measure_time(arr_worst.copy()))
+
+
+# Plotting Time Complexity
+plt.figure(figsize=(8,5))
+plt.plot(sizes, best_times, marker='o', color='green', label='Best Case (O(n log n))')
+plt.plot(sizes, avg_times, marker='s', color='blue', label='Average Case (O(n log n))')
+plt.plot(sizes, worst_times, marker='^', color='red', label='Worst Case (O(n²))')
+
+plt.title('Quick Sort Time Complexity (with Partition Function)')
+plt.xlabel('Input Size (n)')
+plt.ylabel('Time Taken (seconds)')
+plt.grid(True)
+plt.legend()
+plt.show()

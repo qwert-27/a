@@ -1,0 +1,86 @@
+#knapsack
+BEGIN
+
+    PRINT "=== Fractional Knapsack Problem ==="
+
+    READ n ← number of items
+
+    INITIALIZE arrays:
+        w[1..n] ← weights
+        p[1..n] ← profits
+
+    FOR i FROM 1 TO n DO
+        READ w[i] ← weight of item i
+        READ p[i] ← profit of item i
+    ENDFOR
+
+    READ m ← capacity of knapsack
+
+    # ---------- STEP 1: CALCULATE PROFIT/WEIGHT RATIO ----------
+    FOR i FROM 1 TO n DO
+        ratio[i] ← p[i] / w[i]
+    ENDFOR
+
+
+    # ---------- STEP 2: SORT ITEMS BY RATIO (DESCENDING ORDER) ----------
+    FOR i FROM 1 TO n - 1 DO
+        FOR j FROM i + 1 TO n DO
+            IF ratio[i] < ratio[j] THEN
+                SWAP ratio[i] ↔ ratio[j]
+                SWAP w[i] ↔ w[j]
+                SWAP p[i] ↔ p[j]
+            ENDIF
+        ENDFOR
+    ENDFOR
+
+
+
+
+
+
+#code
+# Fractional Knapsack Problem (Textbook Approach)
+
+n = int(input("Enter number of items: "))
+w = []
+p = []
+
+for i in range(n):
+    w.append(float(input(f"Enter weight of item {i+1}: ")))
+    p.append(float(input(f"Enter profit of item {i+1}: ")))
+
+m = float(input("Enter capacity of knapsack: "))
+
+# Calculate profit/weight ratio
+ratio = [p[i] / w[i] for i in range(n)]
+
+# Sort items based on ratio (descending)
+for i in range(n - 1):
+    for j in range(i + 1, n):
+        if ratio[i] < ratio[j]:
+            ratio[i], ratio[j] = ratio[j], ratio[i]
+            w[i], w[j] = w[j], w[i]
+            p[i], p[j] = p[j], p[i]
+
+# Greedy selection
+total_profit = 0.0
+remaining_capacity = m
+x = [0.0] * n  # fraction of items taken
+
+for i in range(n):
+    if w[i] <= remaining_capacity:
+        x[i] = 1.0
+        total_profit += p[i]
+        remaining_capacity -= w[i]
+    else:
+        x[i] = remaining_capacity / w[i]
+        total_profit += x[i] * p[i]
+        break
+
+# Display results
+print("\nItem\tWeight\tProfit\tFraction")
+for i in range(n):
+    print(f"{i+1}\t{w[i]}\t{p[i]}\t{x[i]:.2f}")
+
+print(f"\nMaximum Profit: {total_profit:.2f}")
+

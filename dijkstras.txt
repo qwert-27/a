@@ -1,0 +1,109 @@
+#dijkstras
+BEGIN
+
+    PRINT "=== Dijkstra's Shortest Path Algorithm ==="
+
+    READ n ← number of vertices
+
+    PRINT "Enter adjacency matrix (0 if no edge):"
+    FOR i FROM 0 TO n-1 DO
+        READ row[i][0..n-1]
+        graph[i] ← row[i]
+    ENDFOR
+
+    READ src ← source vertex (0-indexed)
+
+    # ---------- STEP 1: INITIALIZATION ----------
+    FOR i FROM 0 TO n-1 DO
+        dist[i] ← ∞                 # Distance to all vertices
+        visited[i] ← FALSE           # None visited yet
+    ENDFOR
+    dist[src] ← 0                    # Distance to source is 0
+
+
+    # ---------- STEP 2: MAIN LOOP ----------
+    FOR count FROM 0 TO n-1 DO
+
+        # Find the vertex u with minimum distance not yet visited
+        min_dist ← ∞
+        u ← -1
+        FOR v FROM 0 TO n-1 DO
+            IF (NOT visited[v]) AND (dist[v] < min_dist) THEN
+                min_dist ← dist[v]
+                u ← v
+            ENDIF
+        ENDFOR
+
+        visited[u] ← TRUE            # Mark u as processed
+
+        # Update distance values of adjacent vertices
+        FOR v FROM 0 TO n-1 DO
+            IF (graph[u][v] > 0) AND (NOT visited[v]) THEN
+                IF dist[v] > dist[u] + graph[u][v] THEN
+                    dist[v] ← dist[u] + graph[u][v]
+                ENDIF
+            ENDIF
+        ENDFOR
+
+    ENDFOR
+
+
+    # ---------- STEP 3: DISPLAY RESULTS ----------
+    PRINT "Vertex\tDistance from Source"
+    FOR i FROM 0 TO n-1 DO
+        PRINT i, dist[i]
+    ENDFOR
+
+END
+
+
+
+
+
+
+
+#code
+import sys
+
+def dijkstra(graph, src, n):
+    dist = [sys.maxsize] * n   # Initialize distances as infinity
+    visited = [False] * n      # Track visited vertices
+    dist[src] = 0              # Distance to source is 0
+
+    for _ in range(n):
+        # Find vertex u with minimum distance value not yet processed
+        min_dist = sys.maxsize
+        u = -1
+        for v in range(n):
+            if not visited[v] and dist[v] < min_dist:
+                min_dist = dist[v]
+                u = v
+
+        visited[u] = True
+
+        # Update distance of adjacent vertices of u
+        for v in range(n):
+            if graph[u][v] > 0 and not visited[v]:
+                if dist[v] > dist[u] + graph[u][v]:
+                    dist[v] = dist[u] + graph[u][v]
+
+    # Print shortest distances
+    print("\nVertex\tDistance from Source")
+    for i in range(n):
+        print(f"{i}\t{dist[i]}")
+
+# -----------------------
+# Main program
+# -----------------------
+
+n = int(input("Enter number of vertices: "))
+
+print("Enter the adjacency matrix (enter 0 if no edge):")
+graph = []
+for i in range(n):
+    row = list(map(int, input().split()))
+    graph.append(row)
+
+src = int(input("Enter the source vertex (0 - indexed): "))
+
+dijkstra(graph, src, n)

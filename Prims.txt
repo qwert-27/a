@@ -1,0 +1,96 @@
+#Prims
+BEGIN
+
+    PRINT "=== Prim's Minimum Spanning Tree Algorithm ==="
+
+    READ n ← number of vertices
+    READ graph[1..n][1..n]       # adjacency matrix representation
+                                 # graph[i][j] = weight of edge (i, j), or 0 if no edge
+
+    # ---------- INITIALIZATION ----------
+    CREATE arrays:
+        key[1..n]     ← ∞          # Minimum edge weight to include vertex in MST
+        parent[1..n]  ← NULL       # Stores parent vertices for MST edges
+        mstSet[1..n]  ← FALSE      # Track included vertices
+
+    key[1] ← 0                     # Start from vertex 1 (0 in Python)
+    parent[1] ← -1                 # Root of MST has no parent
+
+
+    # ---------- MAIN LOOP ----------
+    FOR count ← 1 TO n DO
+        # Step 1: Pick vertex u with minimum key value not yet in MST
+        min_key ← ∞
+        u ← -1
+        FOR v ← 1 TO n DO
+            IF mstSet[v] = FALSE AND key[v] < min_key THEN
+                min_key ← key[v]
+                u ← v
+            ENDIF
+        ENDFOR
+
+        # Step 2: Include u in MST
+        mstSet[u] ← TRUE
+
+        # Step 3: Update key and parent values for adjacent vertices
+        FOR v ← 1 TO n DO
+            IF graph[u][v] > 0 AND mstSet[v] = FALSE AND graph[u][v] < key[v] THEN
+                key[v] ← graph[u][v]
+                parent[v] ← u
+            ENDIF
+        ENDFOR
+    ENDFOR
+
+
+
+
+
+
+#code
+import sys
+
+def prim_mst(graph, n):
+    key = [sys.maxsize] * n  # Minimum weight edge for each vertex
+    parent = [None] * n       # Array to store MST
+    mstSet = [False] * n      # Vertices included in MST
+
+    key[0] = 0                # Start from vertex 0
+    parent[0] = -1            # Root of MST
+
+    for _ in range(n):
+        # Pick the vertex with minimum key value not yet included in MST
+        min_key = sys.maxsize
+        u = -1
+        for v in range(n):
+            if not mstSet[v] and key[v] < min_key:
+                min_key = key[v]
+                u = v
+
+        mstSet[u] = True  # Include u in MST
+
+        # Update key and parent for adjacent vertices
+        for v in range(n):
+            if graph[u][v] > 0 and not mstSet[v] and graph[u][v] < key[v]:
+                key[v] = graph[u][v]
+                parent[v] = u
+
+    # Print MST edges and total weight
+    print("\nEdge \tWeight")
+    total_weight = 0
+    for i in range(1, n):
+        print(f"{parent[i]} - {i} \t{graph[i][parent[i]]}")
+        total_weight += graph[i][parent[i]]
+    print(f"\nTotal weight of MST: {total_weight}")
+
+# -----------------------
+# Main Program
+# -----------------------
+if __name__ == "__main__":
+    n = int(input("Enter number of vertices: "))
+    print("Enter adjacency matrix (0 if no edge):")
+    graph = []
+    for _ in range(n):
+        row = list(map(int, input().split()))
+        graph.append(row)
+
+    prim_mst(graph, n)

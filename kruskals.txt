@@ -1,0 +1,91 @@
+#kruskals
+# 5.  Define FIND(x):
+#         if parent[x] != x then
+#             parent[x] = FIND(parent[x])
+#         return parent[x]
+
+# 6.  Define UNION(u, v):
+#         root_u = FIND(u)
+#         root_v = FIND(v)
+#         if root_u != root_v then
+#             if rank[root_u] < rank[root_v] then
+#                 parent[root_u] = root_v
+#             else if rank[root_u] > rank[root_v] then
+#                 parent[root_v] = root_u
+#             else
+#                 parent[root_v] = root_u
+#                 rank[root_u] = rank[root_u] + 1
+
+# #--------------------------------------------
+
+# 7.  For each edge (u, v, w) in sorted list of edges do
+#         if FIND(u) != FIND(v) then
+#             Add edge (u, v, w) to MST
+#             total_weight = total_weight + w
+#             UNION(u, v)
+
+
+
+
+
+
+
+#code
+class DisjointSet:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])  # Path compression
+        return self.parent[u]
+
+    def union(self, u, v):
+        root_u = self.find(u)
+        root_v = self.find(v)
+        if root_u != root_v:
+            if self.rank[root_u] < self.rank[root_v]:
+                self.parent[root_u] = root_v
+            elif self.rank[root_u] > self.rank[root_v]:
+                self.parent[root_v] = root_u
+            else:
+                self.parent[root_v] = root_u
+                self.rank[root_u] += 1
+
+
+def kruskal(n, edges):
+    # Sort edges based on weight
+    edges.sort(key=lambda x: x[2])
+    ds = DisjointSet(n)
+
+    mst = []
+    total_cost = 0
+
+    for u, v, w in edges:
+        if ds.find(u) != ds.find(v):
+            mst.append((u, v, w))
+            total_cost += w
+            ds.union(u, v)
+
+    # Print MST edges and total cost
+    print("\nEdge \tWeight")
+    for u, v, w in mst:
+        print(f"{u} - {v} \t{w}")
+    print(f"\nTotal weight of MST: {total_cost}")
+
+
+# -----------------------
+# Main Program
+# -----------------------
+if __name__ == "__main__":
+    n = int(input("Enter number of vertices: "))
+    e = int(input("Enter number of edges: "))
+
+    edges = []
+    print("Enter edges (u v w):")
+    for _ in range(e):
+        u, v, w = map(int, input().split())
+        edges.append((u, v, w))
+
+    kruskal(n, edges)

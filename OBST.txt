@@ -1,0 +1,126 @@
+#OBST
+BEGIN
+
+    PRINT "=== Optimal Binary Search Tree (OBST) ==="
+
+    READ n ← number of keys
+    READ keys[1..n]                     # list of keys
+    READ p[1..n]                        # probabilities of successful searches
+    READ q[0..n]                        # probabilities of unsuccessful searches
+
+    # ---------- STEP 1: INITIALIZATION ----------
+    CREATE arrays e[1..n+1][0..n], w[1..n+1][0..n], root[1..n][1..n]
+
+    FOR i ← 1 TO n+1 DO
+        e[i][i-1] ← q[i-1]
+        w[i][i-1] ← q[i-1]
+    ENDFOR
+
+
+    # ---------- STEP 2: BUILD TABLES USING DP ----------
+    FOR l ← 1 TO n DO                         # l = length of subtree
+        FOR i ← 1 TO n - l + 1 DO
+            j ← i + l - 1
+            w[i][j] ← w[i][j-1] + p[j] + q[j] # total probability weight
+            e[i][j] ← ∞
+            FOR r ← i TO j DO                 # try each key as root
+                t ← e[i][r-1] + e[r+1][j] + w[i][j]
+                IF t < e[i][j] THEN
+                    e[i][j] ← t
+                    root[i][j] ← r
+                ENDIF
+            ENDFOR
+        ENDFOR
+    ENDFOR
+
+
+    # ---------- STEP 3: DISPLAY TREE ----------
+    PRINT "Optimal Binary Search Tree Structure:"
+    CALL PRINT_TREE(root, keys, 1, n, indent = "", is_left = NULL)
+
+END
+
+
+
+
+
+
+
+
+
+#code
+//obst dynamic
+
+def obst(keys, p, q, n):
+    e = [[0] * (n+2) for _ in range(n+2)]
+    w = [[0] * (n+2) for _ in range(n+2)]
+    root = [[0] * (n+1) for _ in range(n+1)]
+
+    for i in range(1, n+2):
+        e[i][i-1] = q[i-1]
+        w[i][i-1] = q[i-1]
+
+    for l in range(1, n+1):
+        for i in range(1, n - l + 2):
+            j = i + l - 1
+            w[i][j] = w[i][j-1] + p[j-1] + q[j]
+            e[i][j] = float('inf')
+            for r in range(i, j+1):
+                t = e[i][r-1] + e[r+1][j] + w[i][j]
+                if t < e[i][j]:
+                    e[i][j] = t
+                    root[i][j] = r
+    return root
+
+def print_tree_ascii(root, keys, i, j, indent="", is_left=None):
+    if i > j:
+        return
+    
+    r = root[i][j]
+    
+    # Print right subtree first, indent by 6 spaces
+    print_tree_ascii(root, keys, r+1, j, indent + "      ", False)
+    
+    # Print current node with branch symbol if not root
+    if is_left is None:
+        print(indent + keys[r-1])  # root node, no prefix
+    elif is_left:
+        print(indent + "└── " + keys[r-1])
+    else:
+        print(indent + "┌── " + keys[r-1])
+    
+    # Print left subtree
+    print_tree_ascii(root, keys, i, r-1, indent + "      ", True)
+
+def input_list(prompt, count):
+    while True:
+        vals = input(prompt).strip().split()
+        if len(vals) != count:
+            print(f"Please enter exactly {count} values separated by spaces.")
+            continue
+        return vals
+
+def input_float_list(prompt, count):
+    while True:
+        try:
+            vals = list(map(float, input(prompt).strip().split()))
+            if len(vals) != count:
+                print(f"Please enter exactly {count} numeric values separated by spaces.")
+                continue
+            return vals
+        except:
+            print("Invalid input. Please enter numbers separated by spaces.")
+
+def main():
+    n = int(input("Enter number of keys: "))
+    keys = input_list(f"Enter {n} keys separated by spaces: ", n)
+    p = input_float_list(f"Enter {n} probabilities p (space separated): ", n)
+    q = input_float_list(f"Enter {n+1} probabilities q (space separated): ", n+1)
+
+    root = obst(keys, p, q, n)
+
+    print("\nOptimal Binary Search Tree (vertical with branches):\n")
+    print_tree_ascii(root, keys, 1, n)
+
+if __name__ == "__main__":
+    main()

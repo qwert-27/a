@@ -1,0 +1,94 @@
+#merge sort   
+ FUNCTION merge_sort(arr)
+        IF length(arr) <= 1 THEN
+            RETURN arr
+        ENDIF
+
+        mid ← length(arr) // 2
+        left ← merge_sort(arr[0 : mid])
+        right ← merge_sort(arr[mid : end])
+
+        RETURN merge(left, right)
+    END FUNCTION
+
+
+    FUNCTION merge(left, right)
+        result ← empty list
+        i ← 0
+        j ← 0
+
+        WHILE i < length(left) AND j < length(right) DO
+            IF left[i] <= right[j] THEN
+                APPEND left[i] TO result
+                i ← i + 1
+            ELSE
+                APPEND right[j] TO result
+                j ← j + 1
+            ENDIF
+        ENDWHILE
+
+        APPEND remaining elements of left[i:] TO result
+        APPEND remaining elements of right[j:] TO result
+
+        RETURN result
+    END FUNCTION
+
+
+
+
+
+
+#merge sort code
+import random
+import time
+import matplotlib.pyplot as plt
+
+# Merge Sort Implementation
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+            
+    result.extend(left[i:])
+    result.extend(right[j:])
+    
+    return result
+
+
+# Measure Time Complexity
+sizes = [100, 500, 1000, 2000, 5000, 10000, 20000]
+times = []
+
+for n in sizes:
+    arr = [random.randint(0, 100000) for _ in range(n)]
+    start = time.time()
+    merge_sort(arr)
+    end = time.time()
+    times.append(end - start)
+
+# Plotting the results
+plt.plot(sizes, times, marker='o', color='b', label='Merge Sort')
+plt.title('Merge Sort Time Complexity')
+plt.xlabel('Input Size (n)')
+plt.ylabel('Time Taken (seconds)')
+plt.grid(True)
+plt.legend()
+plt.show()
+

@@ -1,0 +1,102 @@
+#job sequence
+BEGIN
+
+    FUNCTION job_sequencing_with_deadlines(n, jobs)
+        # jobs = [(job_id, deadline, profit)]
+
+        # ---------- STEP 1: SORT JOBS BY PROFIT ----------
+        SORT jobs IN decreasing order of profit
+
+        D ← list of deadlines from jobs
+        P ← list of profits from jobs
+        J ← array of size (n + 1) initialized to 0      # job slots (1-based indexing)
+
+        J[1] ← 1      # assign first job to first slot
+        k ← 1         # count of selected jobs
+
+
+        # ---------- STEP 2: LOOP THROUGH REMAINING JOBS ----------
+        FOR i FROM 2 TO n DO
+            r ← k
+
+            # Find correct position to insert job i
+            WHILE r ≥ 1 AND D[J[r]] > D[i - 1] DO
+                r ← r - 1
+            ENDWHILE
+
+            # ---------- STEP 3: CHECK FOR AVAILABLE SLOT ----------
+            IF (D[J[r]] ≤ D[i - 1]) AND (D[i - 1] > r) THEN
+                # Shift existing jobs to make space
+                FOR q FROM k DOWNTO r + 1 DO
+                    J[q + 1] ← J[q]
+                ENDFOR
+                J[r + 1] ← i
+                k ← k + 1
+
+            ELSE IF D[i - 1] > D[J[r]] THEN
+                J[k + 1] ← i
+                k ← k + 1
+            ENDIF
+        ENDFOR
+
+
+
+
+
+
+#code
+# Job Sequencing with Deadlines — Textbook Loop-based Approach
+
+def job_sequencing_with_deadlines(n, jobs):
+    # jobs = [(job_id, deadline, profit)]
+
+    # Step 1: Sort by decreasing profit
+    jobs.sort(key=lambda x: x[2], reverse=True)
+
+    D = [job[1] for job in jobs]  # deadlines
+    P = [job[2] for job in jobs]  # profits
+    J = [0] * (n + 1)             # job slots (1-based indexing)
+
+    J[1] = 1  # assign first job
+    k = 1     # number of jobs selected
+
+    for i in range(2, n + 1):
+        r = k
+        # Step 2: find proper place to insert job i
+        while r >= 1 and D[J[r]] > D[i - 1]:
+            r -= 1
+
+        # Step 3: Check if slot is available
+        if (D[J[r]] <= D[i - 1]) and (D[i - 1] > r):
+            # Shift jobs forward to make space
+            for q in range(k, r, -1):
+                J[q + 1] = J[q]
+            J[r + 1] = i
+            k += 1
+
+        elif D[i - 1] > D[J[r]]:
+            J[k + 1] = i
+            k += 1
+
+    # Step 4: Compute total profit
+    total_profit = sum(P[J[m] - 1] for m in range(1, k + 1))
+    sequence = [jobs[J[m] - 1][0] for m in range(1, k + 1)]
+
+    # Display result
+    print("\nSelected Job Sequence:", " → ".join(sequence))
+    print("Maximum Profit:", total_profit)
+
+
+# ---------- MAIN PROGRAM ----------
+if __name__ == "__main__":
+    print("=== Job Sequencing with Deadlines (Textbook While Loop Version) ===")
+
+    n = int(input("Enter number of jobs: "))
+    jobs = []
+
+    print("\nEnter Job ID, Deadline, Profit:")
+    for _ in range(n):
+        job_id, deadline, profit = input().split()
+        jobs.append((job_id, int(deadline), int(profit)))
+
+    job_sequencing_with_deadlines(n, jobs)

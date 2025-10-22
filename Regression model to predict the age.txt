@@ -1,0 +1,57 @@
+#Regression model to predict the age of a person.
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# 1. Load dataset
+FILE_PATH = "/content/drive/MyDrive/facial.csv"
+df = pd.read_csv(FILE_PATH)
+
+# 2. Drop unnamed columns
+df = df.drop(columns=df.columns[df.columns.str.contains('^Unnamed')])
+
+# 3. Drop or fill rows with NaNs (drop is simplest here)
+df = df.dropna()
+
+print("Cleaned Columns:", df.columns.tolist())
+print("First 5 rows after cleaning:\n", df.head(), "\n")
+
+# 4. Features & target
+X = df[['wrinkle_score', 'eye_sag', 'jawline_ratio']]  # include jawline_ratio if useful
+y = df['age']
+
+# 5. Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 6. Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 7. Predictions
+y_pred = model.predict(X_test)
+
+# 8. Evaluate performance
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
+
+print("\nModel Performance:")
+print(f"MSE  : {mse:.4f}")
+print(f"RMSE : {rmse:.4f}")
+print(f"R²   : {r2:.4f}")
+
+# 9. Visualization
+plt.figure(figsize=(6,6))
+plt.scatter(y_test, y_pred, alpha=0.7, color="blue", label="Predictions")
+mn, mx = min(y_test.min(), y_pred.min()), max(y_test.max(), y_pred.max())
+plt.plot([mn, mx], [mn, mx], 'r--', lw=2, label="Perfect Prediction Line")
+plt.xlabel("Actual Age")
+plt.ylabel("Predicted Age")
+plt.title("Actual vs Predicted Age")
+plt.legend()
+plt.show()
